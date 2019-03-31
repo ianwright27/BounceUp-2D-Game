@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>BounceUp | HTML5 Canvas and JavaScript 2D Game By Ian Wright (Version of old Brick Game)</title>
+	<style type="text/css">
+		#canvas{
+		    position:absolute;
+		    top:10px;left:10px;
+			margin: 0 auto;
+			background: #efefef;
+			border:1px solid src('img/563149da.png');
+			cursor:crosshair;
+		}
+		*{
+			margin: 0;
+		}
+		body{
+		    margin:0px;overflow: hidden;cursor:crosshair;
+		    background-image:url('img/563149da.png');
+		}
+		#gameText{
+			position: absolute;
+			top:180px;
+			left:180px;
+			width:300px;
+			font-size:50px;
+			padding:10px;
+			z-index: 2;
+			display: none;
+		}
+		.share-source{
+			position: absolute;
+			top:10px;
+			left:680px;
+			background: #efefef;
+			width:600px;
+			padding:10px;
+			height:420px;
+			overflow-y:scroll;
+			overflow-x:hidden;
+			color:#555;
+			font-family: Monaco;
+			cursor:text;
+		}
+		.share-source p{
+			position: absolute;
+			top:0px; left:1px;
+			background: #ecf246;
+			color: #444;
+			padding:10px;
+			border-left:3px solid #168720;
+			cursor:pointer;
+		}
+		.share-source p:hover{
+			box-shadow: 1px 1px 10px rgba(0,0,0,.3);
+		}
+		.instructions{
+			position: absolute;
+			top: 470px;
+			left:10px;
+			width:625px;
+			background: #f4e842;
+			font-size: 20px;
+			font-family: sans-serif;
+			padding:10px;
+			border-left:5px solid #168720;
+			cursor: pointer;
+		}pre, code {
+  font-family: monospace, monospace;
+}
+pre {
+  overflow: auto;
+}
+pre > code {
+  display: block;
+  word-wrap: normal;
+}
+.bottom{
+	height:150px;
+	width:625px;
+	top:470px;
+	left:680px;
+	position: absolute;top:;
+	background: transparent;
+	}
+.bottom p{
+	position: absolute;
+	top:10px;right:210px;
+	width:100px;
+	background: #e6ed2d;
+	padding:10px;
+	font-family: sans-serif;
+}
+.bottom img{
+	position: absolute;
+	right:0px;top:0px;
+	height:150px;
+}
+#farewell{
+	position: absolute;
+	top:470px;left:680px;
+	width:250px;
+	padding:10px;
+	font-size: 18px; 
+	height:140px;
+	line-height: 2;
+	background: #55cc51;
+	color:#000;
+}
+
+	</style>
+</head>
+<body>
+<div>
+<canvas id="canvas"></canvas>
+</div>
+<script type="text/javascript" src="js.js"></script>
+<div class="instructions">
+	<h3>Instructions</h3>
+	<p>(1). Use the <strong>Mouse or Touchpad</strong> to make the the block slide across.</p>
+	<p>(2).Do your best to block the ball from falling to the surface</p>
+	<p>(2).If you <b>loose</b>, <strong>click on the Game to RESTART</strong></p>
+	<br>
+	<p>========Highest Score:  1250 points===========</p>
+</div>
+<span id="farewell">
+	Enjoy the game. Next time I'll update with more Visual Effects and more complicated Concepts that apply to the real world.
+</span>
+    <div class="share-source">
+    	<p>JavaScript</p>
+    	<pre>
+    	<code>
+    	//Here is the Source Code
+
+   	//Created By IAN WRIGHT
+ 
+   	//Making a HTML5 CANVAS Game
+
+        var canvas = document.querySelector('canvas');<br>
+        var c = canvas.getContext('2d');<br>
+        canvas.width = 650;<br>
+        canvas.height =440;<br>
+        var gameLost = false;<br>
+        var r = 10;<br>
+        var bX = Math.floor(Math.random()*300); <br>
+        var bY = Math.floor(Math.random()*100);<br>
+        var bW = bH = 10; <br>
+        var bxV = 7;<br>
+        var byV = 7;<br>
+        var pX = 350;<br>
+        var pY = 400;<br>
+        var pW = 150;<br>
+        var pH = 40;<br> 
+        var pxV = 2;<br>
+        var pyV = 2;<br>
+        var Score = 0;<br>
+        var gameOverText = "";<br>
+        window.addEventListener('mousemove', function(e){<br>
+	          pX = e.clientX;<br>
+        })<br>
+        var colorArray = [<br>
+	        '#2c3e50',<br>
+	        '#e74c3c',<br>
+	        '#ecf0f1',<br>
+	        '#3498db',<br>
+	        '#2980b9'<br>
+        ]<br>
+        maxRadius = 5;<br>
+        minRadius = 1;<br>
+        function Circle(x,y, dx, dy, radius){<br>
+        this.x = x;<br>
+	        this.y = y;<br>
+	        this.dx = dx;<br>
+	        this.dy = dy;<br>
+	        this.radius = radius;<br>
+	        this.minRadius = radius;<br>
+	        this.color = colorArray[Math.floor(Math.random()*colorArray.length)];<br>
+	        this.draw = function(){<br>
+		        c.beginPath();<br>
+		        c.arc(this.x, this.y, this.radius, 0, Math.PI * 2, false);<br>
+		        c.fillStyle = this.color;<br>
+		        c.fill();<br>
+	        }<br>
+	        this.update = function(){<br>
+		        if(this.x+ this.radius >innerWidth || this.x - this.radius < 0){<br>
+			        this.dx = -this.dx;<br>
+		        }<br>
+		        if(this.y+ this.radius > innerHeight || this.y+ this.radius < 30){<br>
+			        this.dy = -this.dy;<br>
+		        }<br>
+		        this.x += this.dx;<br>
+		        this.y += this.dy;<br>
+<br>
+		        if(bX - this.x < 50 && bX - this.x > -50 && bY - this.y < 50 && bY - this.y > -50){<br>
+			        if(this.radius < maxRadius){<br>
+				        this.radius +=1;<br>
+			        }<br>
+		        }else if(this.radius > this.minRadius){<br>
+			        this.radius -= 1;<br>
+		        }<br>
+
+		        this.draw();<br>
+	        }<br>
+        }<br>
+        function init(){<br>
+	        circleArray = [];<br>
+	        for(var i = 0 ; i < 1000; i++) {<br>
+		        var radius = Math.random()*2 +1;<br>
+		        var x = Math.random()*(innerWidth-radius*2)+radius;<br>
+		        var dy = (Math.random()*0.5);<br>
+		        var y = Math.random()*(innerHeight-radius*2)+radius;<br>
+		        var dx = (Math.random()*0.5);;<br>
+		        circleArray.push(new Circle(x,y,dx,dy,radius));<br>
+	        }<br>
+        }<br>
+        init();<br>
+        function loop(){<br>
+	        var repeat = requestAnimationFrame(loop);<br>
+	        c.clearRect(0,0, canvas.width, canvas.height);<br>
+	        c.beginPath();<br>
+	        c.moveTo(0,0)<br>
+	        c.fillStyle = "#fff";<br>
+	        c.arc(bX, bY, r, 0, Math.PI*2, false);<br>
+	        c.fillStyle = "#2c3e50";<br>
+	        c.fill();<br>
+	        c.fillStyle= "#2c3e50";<br>
+	        c.fillRect(pX, pY, pW, pH);<br>
+	        c.fillTextStyle = "red";<br>
+	        c.font = "28px sans-serif"<br>
+	        c.fillText("Score :"+parseInt(Score),canvas.width-150, 40);<br>
+	        if(bX+r>canvas.width || bX<0){<br>
+		        bxV = -bxV;<br>
+	        }<br>
+	        if(bY<0){<br>
+		        byV = -byV;<br>
+	        }<br>
+	        if(pX+pW>canvas.width || pX<0){<br>
+		        pxV = 0;<br>
+	        }<br>
+	        if(pY<0){<br>
+		        pyV = 0;<br>
+	        }<br>
+	        if(bY > canvas.height){<br>
+		        gameLost = true;<br>
+			        if(gameLost == true){<br>
+				        gameEnd();<br>
+			        }<br>
+	        }<br>
+        function gameEnd(){<br>
+	        cancelAnimationFrame(repeat);<br>
+		        window.addEventListener('click', function(){<br>
+			        window.location = 'index.html'; <br>
+		        })<br>
+        }<br>
+	        var offSetRight = pX+pW;<br>
+	        if(bY+r*2 > canvas.height-pH && bX > pX && bX < offSetRight){<br>
+		        byV = -byV;<br>
+		        Score += 10;<br>
+	        }<br>
+	        bX += bxV;<br>
+	        bY += byV;<br>
+	        for(var i  = 0; i< circleArray.length; i++){<br>
+		        circleArray[i].update();	<br>
+	        }<br>
+        }<br>
+        loop();<br>
+    </code>
+    </pre>
+    </div>
+    <div class="bottom">
+    	<p>Click on this image to Contact Me for Web Design Needs</p>
+    	<a href="mailto:thewian27@gmail.com"><img class="" src="img/26805512_808642829320862_6795723931029315260_n.jpg"></a>
+    </div>
+</body>
+</html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
